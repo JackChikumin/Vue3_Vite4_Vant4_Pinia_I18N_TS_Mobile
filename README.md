@@ -1,6 +1,6 @@
-# Vue3_Vite4_Vant4_Pinia_TS_Mobile
+# Vue3_Vite4_Vant4_Pinia_I18N_TS_Mobile
 
-基于Vue3、Vite4、Vant4、Pinia、TypeScript创建并集成axios、主题切换、夜间模式的移动端项目,开箱即用
+基于Vue3、Vite4、Vant4、Pinia、i18n国际化、TypeScript创建并集成axios、主题切换、夜间模式的移动端项目,开箱即用
 
 ## Recommended IDE Setup
 
