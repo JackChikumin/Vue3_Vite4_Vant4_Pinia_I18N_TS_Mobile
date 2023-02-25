@@ -1,4 +1,6 @@
 import qs from 'qs';
+import axios from 'axios';
+export * from './axiosTransform';
 import { cloneDeep } from 'lodash-es';
 import { isFunction } from '/@/utils/is';
 import { AxiosCanceler } from './axiosCancel';
@@ -7,11 +9,8 @@ import { RequestEnum } from '/@/enums/httpEnum';
 import { EncryptParams } from '/@/utils/cipher';
 import { ContentTypeEnum } from '/@/enums/httpEnum';
 import type { CreateAxiosOptions } from './axiosTransform';
-import axios, { type InternalAxiosRequestConfig } from 'axios';
 import type { RequestOptions, Result, UploadFileParams } from '/#/axios';
-import type { AxiosRequestConfig, AxiosInstance, AxiosResponse, AxiosError } from 'axios';
-
-export * from './axiosTransform';
+import type { AxiosRequestConfig, AxiosInstance, AxiosResponse, AxiosError, InternalAxiosRequestConfig } from 'axios';
 
 /**
  * @description:  axios module
@@ -63,7 +62,7 @@ export class VAxios {
   }
 
   /**
-   * @description: Interceptor configuration
+   * @description: Interceptor configuration 拦截器配置
    */
   private setupInterceptors() {
     const transform = this.getTransform();
@@ -80,7 +79,7 @@ export class VAxios {
     const axiosCanceler = new AxiosCanceler();
 
     // Request interceptor configuration processing
-    this.axiosInstance.interceptors.request.use((config:InternalAxiosRequestConfig) => {
+    this.axiosInstance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
       // If cancel repeat request is turned on, then cancel repeat request is prohibited
       // @ts-ignore
       const { ignoreCancelToken } = config.requestOptions;
@@ -113,7 +112,10 @@ export class VAxios {
     // Response result interceptor error capture
     responseInterceptorsCatch &&
       isFunction(responseInterceptorsCatch) &&
-      this.axiosInstance.interceptors.response.use(undefined, responseInterceptorsCatch);
+      this.axiosInstance.interceptors.response.use(undefined, (error) => {
+        // @ts-ignore
+        return responseInterceptorsCatch(this.axiosInstance, error);
+      });
   }
 
   /**
@@ -194,11 +196,11 @@ export class VAxios {
     let conf: CreateAxiosOptions = cloneDeep(config);
     const transform = this.getTransform();
 
-    // �����ǰ��Ҫ���ܲ���
+    // 如果当前需要加密参数
     const { VITE_GLOB_ENCRYPT } = getAppEnvConfig();
     const Encrypted = Object.is(VITE_GLOB_ENCRYPT, true);
     if (Encrypted) {
-      // ִ�в�������
+      // 执行参数加密
       config.params = EncryptParams(qs.stringify(config.params, { encode: false }));
     }
 
@@ -206,7 +208,7 @@ export class VAxios {
 
     const opt: RequestOptions = Object.assign({}, requestOptions, options);
 
-    const { beforeRequestHook, requestCatchHook, transformRequestHook } = transform || {};
+    const { beforeRequestHook, requestCatchHook, transformResponseHook } = transform || {};
     if (beforeRequestHook && isFunction(beforeRequestHook)) {
       conf = beforeRequestHook(conf, opt);
     }
@@ -218,9 +220,9 @@ export class VAxios {
       this.axiosInstance
         .request<any, AxiosResponse<Result>>(conf)
         .then((res: AxiosResponse<Result>) => {
-          if (transformRequestHook && isFunction(transformRequestHook)) {
+          if (transformResponseHook && isFunction(transformResponseHook)) {
             try {
-              const ret = transformRequestHook(res, opt);
+              const ret = transformResponseHook(res, opt);
               resolve(ret);
             } catch (err) {
               reject(err || new Error('request error!'));
