@@ -1,6 +1,6 @@
-# vue-project
+# Vue3_Vite4_Vant4_Pinia_TS_Mobile
 
-This template should help get you started developing with Vue 3 in Vite.
+基于Vue3、Vite4、Vant4、Pinia、TypeScript创建并集成axio、主题切换、夜间模式的移动端项目,开箱即用
 
 ## Recommended IDE Setup
 
