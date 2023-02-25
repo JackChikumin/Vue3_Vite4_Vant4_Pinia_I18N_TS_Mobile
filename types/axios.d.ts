@@ -1,5 +1,6 @@
 // 错误消息类型
 export type ErrorMessageMode = 'none' | 'modal' | 'message' | undefined;
+export type SuccessMessageMode = ErrorMessageMode;
 
 // 请求配置
 export interface RequestOptions {
@@ -20,12 +21,22 @@ export interface RequestOptions {
   urlPrefix?: string;
   // 错误信息提示类型
   errorMessageMode?: ErrorMessageMode;
+  // 成功消息提示类型
+  successMessageMode?: SuccessMessageMode;
   // 是否添加时间戳
   joinTime?: boolean;
   // 是否忽略取消令牌
   ignoreCancelToken?: boolean;
   // 是否在header中发送token
   withToken?: boolean;
+  // 请求重试机制
+  retryRequest?: RetryRequest;
+}
+
+export interface RetryRequest {
+  isOpenRetry: boolean;
+  count: number;
+  waitTime: number;
 }
 
 // 请求接口返回数据类型配置
