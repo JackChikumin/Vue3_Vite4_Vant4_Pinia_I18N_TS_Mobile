@@ -1,0 +1,2 @@
+# Vue3_Vite4_Vant4_Pinia_TS_Mobile
+基于Vue3和Vite4以及Vant4、Pinia、TypeScript并且集成axio 主题切换、夜间模式的移动端项目开箱即用
